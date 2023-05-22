@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "aral",
+]
+
+[workspace.package]
+version = "0.0.0"
+authors = ["Aral Develop Team", "jmjoy <jmjoy@apache.org>"]
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/jmjoy/aral.git"
