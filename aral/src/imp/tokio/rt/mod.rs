@@ -1,8 +1,22 @@
 use std::future::Future;
 
-pub(crate) struct Builder(tokio::runtime::Builder);
+pub(crate) struct CurrentThreadBuilder(tokio::runtime::Builder);
 
-impl Builder {
+impl CurrentThreadBuilder {
+    pub(crate) fn new() -> Self {
+        let mut builder = tokio::runtime::Builder::new_current_thread();
+        builder.enable_all();
+        Self(builder)
+    }
+
+    pub(crate) fn build(mut self) -> std::io::Result<Runtime> {
+        Ok(Runtime(self.0.build()?))
+    }
+}
+
+pub(crate) struct MultiThreadBuilder(tokio::runtime::Builder);
+
+impl MultiThreadBuilder {
     pub(crate) fn new() -> Self {
         let mut builder = tokio::runtime::Builder::new_multi_thread();
         builder.enable_all();
