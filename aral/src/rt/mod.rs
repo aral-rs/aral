@@ -1,11 +1,11 @@
 use crate::imp;
-use std::future::Future;
+use std::{future::Future, marker::PhantomData};
 
-pub struct Builder(imp::rt::Builder);
+pub struct Builder(imp::RuntimeBuilder);
 
 impl Builder {
     pub fn new() -> Self {
-        Self(imp::rt::Builder::new())
+        Self(imp::RuntimeBuilder::new())
     }
 
     pub fn build(self) -> std::io::Result<Runtime> {
@@ -25,4 +25,14 @@ impl Runtime {
     pub fn block_on<F: Future>(self, future: F) -> F::Output {
         self.0.block_on(future)
     }
+}
+
+pub struct JoinHandle<T>(PhantomData<T>);
+
+pub fn spawn<T>(_future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
+    todo!()
+}
+
+pub fn spawn_blocking<T: Send + 'static>(_f: impl FnOnce() -> T + Send + 'static) -> JoinHandle<T> {
+    todo!()
 }

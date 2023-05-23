@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [ "**" ]
+
+env:
+  RUST_LOG: debug
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: "-D warnings"
+
+jobs:
+  required:
+    name: Required
+    needs:
+      - ci
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check results
+        run: |
+          [[ ${{ needs.ci.result }} == 'success' ]] || exit 1;
+
+  ci:
+    name: CI
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+        features:
+          - ""
+          - "--features runtime-tokio-current-thread"
+          - "--features runtime-tokio-multi-thread"
+          - "--features runtime-async-std"
+          - "--all-features"
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cargo generate lockfile
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+
+      - name: Setup cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ matrix.os }}-ci-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: fmt
+          args: --all -- --check
+
+      - name: Cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --workspace --release ${{ matrix.features }}
+
+      - name: Cargo test
+        uses: actions-rs/cargo@v1
+        if: matrix.features != ''
+        with:
+          command: test
+          args: --workspace  --release ${{ matrix.features }} -- --nocapture
+
+      - name: Cargo doc
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: doc
+          args: --workspace --release ${{ matrix.features }} --no-deps 

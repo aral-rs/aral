@@ -1,15 +1,14 @@
 use std::future::Future;
 
-pub(crate) struct Builder(async_std::task::Builder);
+pub(crate) struct Builder;
 
 impl Builder {
     pub(crate) fn new() -> Self {
-        let builder = async_std::task::Builder::new();
-        Self(builder)
+        Self
     }
 
     pub(crate) fn build(self) -> std::io::Result<Runtime> {
-        Ok(Runtime(self.0))
+        Ok(Runtime(async_std::task::Builder::new()))
     }
 }
 
