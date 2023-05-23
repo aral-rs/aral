@@ -36,7 +36,7 @@ jobs:
           - ""
           - "--features runtime-tokio-current-thread"
           - "--features runtime-tokio-multi-thread"
-          - "--features runtime-runtime-async-std"
+          - "--features runtime-async-std"
           - "--all-features"
 
     runs-on: ${{ matrix.os }}
@@ -75,6 +75,7 @@ jobs:
 
       - name: Cargo test
         uses: actions-rs/cargo@v1
+        if: matrix.features != ""
         with:
           command: test
           args: --workspace  --release ${{ matrix.features }} -- --nocapture
