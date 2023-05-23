@@ -23,3 +23,27 @@ cfg_if! {
     }
 
 }
+
+#[non_exhaustive]
+pub enum RuntimeType {
+    NoRuntime,
+    TokioMultiThread,
+    TokioCurrentThread,
+    AsyncStd,
+}
+
+pub const fn current_runtime_type() -> RuntimeType {
+    if cfg!(feature = "runtime-tokio-multi-thread") {
+        return RuntimeType::TokioMultiThread;
+    }
+
+    if cfg!(feature = "runtime-tokio-current-thread") {
+        return RuntimeType::TokioCurrentThread;
+    }
+
+    if cfg!(feature = "runtime-async-std") {
+        return RuntimeType::AsyncStd;
+    }
+
+    RuntimeType::NoRuntime
+}
