@@ -39,3 +39,15 @@ impl Runtime {
         self.0.block_on(future)
     }
 }
+
+pub struct JoinHandle<T>(tokio::task::JoinHandle<T>);
+
+#[inline]
+pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
+    JoinHandle(tokio::spawn(future))
+}
+
+#[inline]
+pub fn spawn_blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> JoinHandle<T> {
+    JoinHandle(tokio::task::spawn_blocking(f))
+}

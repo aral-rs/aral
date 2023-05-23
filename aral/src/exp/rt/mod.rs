@@ -1,5 +1,5 @@
 use crate::imp;
-use std::{future::Future, marker::PhantomData};
+use std::future::Future;
 
 pub struct Builder(imp::RuntimeBuilder);
 
@@ -27,12 +27,14 @@ impl Runtime {
     }
 }
 
-pub struct JoinHandle<T>(PhantomData<T>);
+pub struct JoinHandle<T>(imp::rt::JoinHandle<T>);
 
-pub fn spawn<T>(_future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
-    todo!()
+#[inline]
+pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
+    JoinHandle(imp::rt::spawn(future))
 }
 
-pub fn spawn_blocking<T: Send + 'static>(_f: impl FnOnce() -> T + Send + 'static) -> JoinHandle<T> {
-    todo!()
+#[inline]
+pub fn spawn_blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> JoinHandle<T> {
+    JoinHandle(imp::rt::spawn_blocking(f))
 }

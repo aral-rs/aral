@@ -4,5 +4,6 @@ macro_rules! no_runtime_specified {
     };
 }
 
-pub(crate) mod rt;
-pub(crate) mod time;
+pub mod fs;
+pub mod rt;
+pub mod time;
