@@ -1,7 +1,9 @@
 use std::future::Future;
 
+#[allow(dead_code)]
 pub(crate) struct CurrentThreadBuilder(tokio::runtime::Builder);
 
+#[allow(dead_code)]
 impl CurrentThreadBuilder {
     pub(crate) fn new() -> Self {
         let mut builder = tokio::runtime::Builder::new_current_thread();
@@ -14,8 +16,10 @@ impl CurrentThreadBuilder {
     }
 }
 
+#[allow(dead_code)]
 pub(crate) struct MultiThreadBuilder(tokio::runtime::Builder);
 
+#[allow(dead_code)]
 impl MultiThreadBuilder {
     pub(crate) fn new() -> Self {
         let mut builder = tokio::runtime::Builder::new_multi_thread();
