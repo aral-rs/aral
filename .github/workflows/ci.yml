@@ -42,7 +42,7 @@ jobs:
           [[ ${{ needs.license-check.result }} == 'success' ]] || exit 1;
 
   license-check:
-    name: License check
+    name: license-check
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
