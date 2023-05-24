@@ -1,3 +1,17 @@
+# Copyright 2023 ARAL Development Team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: CI
 
 on:
@@ -19,11 +33,24 @@ jobs:
     name: Required
     needs:
       - ci
+      - license-check
     runs-on: ubuntu-20.04
     steps:
       - name: Check results
         run: |
           [[ ${{ needs.ci.result }} == 'success' ]] || exit 1;
+          [[ ${{ needs.license-check.result }} == 'success' ]] || exit 1;
+
+  license-check:
+    name: license-check
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check License Header
+        uses: apache/skywalking-eyes/header/@d5466651aaded6fbd588d2278eccc469afc89d92
+        with:
+          config: .licenserc.yaml
 
   ci:
     name: CI
