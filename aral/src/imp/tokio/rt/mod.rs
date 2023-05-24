@@ -1,23 +1,27 @@
+use cfg_if::cfg_if;
 use std::future::Future;
 
 pub struct Builder(tokio::runtime::Builder);
 
 impl Builder {
-    pub fn new() -> Self {
-        let mut builder = {
-            #[cfg(feature = "runtime-tokio-multi-thread")]
-            {
+    cfg_if! {
+        if #[cfg(feature = "runtime-tokio-multi-thread")] {
+            #[inline]
+            fn new_builder() -> tokio::runtime::Builder {
                 tokio::runtime::Builder::new_multi_thread()
             }
 
-            #[cfg(feature = "runtime-tokio-current-thread")]
-            {
+        } else if #[cfg(feature = "runtime-tokio-current-thread")] {
+            #[inline]
+            fn new_builder() -> tokio::runtime::Builder {
                 tokio::runtime::Builder::new_current_thread()
             }
-        };
+        }
+    }
 
+    pub fn new() -> Self {
+        let mut builder = Self::new_builder();
         builder.enable_all();
-
         Self(builder)
     }
 
