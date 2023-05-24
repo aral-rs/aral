@@ -1,4 +1,4 @@
-use std::future::Future;
+use std::{future::Future, io::Result};
 
 pub(crate) struct Builder;
 
@@ -7,7 +7,7 @@ impl Builder {
         Self
     }
 
-    pub(crate) fn build(self) -> std::io::Result<Runtime> {
+    pub(crate) fn build(self) -> Result<Runtime> {
         Ok(Runtime(async_std::task::Builder::new()))
     }
 }

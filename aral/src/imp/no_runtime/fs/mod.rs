@@ -1,6 +1,7 @@
+use crate::io::{Read, Seek, Write};
 use std::{
     fs::{Metadata, Permissions},
-    io::Result,
+    io::{Result, SeekFrom},
     path::{Path, PathBuf},
 };
 
@@ -14,6 +15,28 @@ impl File {
 
     #[inline]
     pub async fn open(_path: impl AsRef<Path>) -> Result<File> {
+        no_runtime_specified!();
+    }
+}
+
+impl Read for File {
+    async fn read(&mut self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+}
+
+impl Write for File {
+    async fn write(&mut self, _buf: &[u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+
+    async fn flush(&mut self) -> Result<()> {
+        no_runtime_specified!();
+    }
+}
+
+impl Seek for File {
+    async fn seek(&mut self, _pos: SeekFrom) -> Result<u64> {
         no_runtime_specified!();
     }
 }
