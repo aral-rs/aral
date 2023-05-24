@@ -33,7 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Cargo publish phper-sys
+      - name: Cargo publish aral
         uses: actions-rs/cargo@v1
         with:
           command: publish
