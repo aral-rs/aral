@@ -1,15 +1,15 @@
 use crate::imp;
 use std::future::Future;
 
-pub struct Builder(imp::RuntimeBuilder);
+pub struct Builder(imp::rt::Builder);
 
 impl Builder {
     pub fn new() -> Self {
-        Self(imp::RuntimeBuilder::new())
+        Self(imp::rt::Builder::new())
     }
 
     pub fn build(self) -> std::io::Result<Runtime> {
-        Ok(Runtime(self.0.build()?))
+        self.0.build().map(Runtime)
     }
 }
 

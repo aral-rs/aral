@@ -1,6 +1,7 @@
+use crate::io::{Read, Seek, Write};
 use std::{
     fs::{Metadata, Permissions},
-    io::Result,
+    io::{Result, SeekFrom},
     path::{Path, PathBuf},
 };
 
@@ -9,12 +10,38 @@ pub struct File(async_std::fs::File);
 impl File {
     #[inline]
     pub async fn create(path: impl AsRef<Path>) -> Result<File> {
-        Ok(File(async_std::fs::File::create(path.as_ref()).await?))
+        async_std::fs::File::create(path.as_ref()).await.map(File)
     }
 
     #[inline]
     pub async fn open(path: impl AsRef<Path>) -> Result<File> {
-        Ok(File(async_std::fs::File::open(path.as_ref()).await?))
+        async_std::fs::File::open(path.as_ref()).await.map(File)
+    }
+}
+
+impl Read for File {
+    #[inline]
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        async_std::io::ReadExt::read(&mut self.0, buf).await
+    }
+}
+
+impl Write for File {
+    #[inline]
+    async fn write(&mut self, buf: &[u8]) -> Result<usize> {
+        async_std::io::WriteExt::write(&mut self.0, buf).await
+    }
+
+    #[inline]
+    async fn flush(&mut self) -> Result<()> {
+        async_std::io::WriteExt::flush(&mut self.0).await
+    }
+}
+
+impl Seek for File {
+    #[inline]
+    async fn seek(&mut self, pos: SeekFrom) -> Result<u64> {
+        async_std::io::prelude::SeekExt::seek(&mut self.0, pos).await
     }
 }
 

@@ -1,21 +1,21 @@
-use std::io::SeekFrom;
+use std::io::{Result, SeekFrom};
 
 pub trait Read {
-    async fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize>;
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize>;
 }
 
 pub trait BufRead: Read {
-    async fn fill_buf(&mut self) -> std::io::Result<&[u8]>;
+    async fn fill_buf(&mut self) -> Result<&[u8]>;
 
     async fn consume(&mut self, amt: usize);
 }
 
 pub trait Write {
-    async fn write(&mut self, buf: &[u8]) -> std::io::Result<usize>;
+    async fn write(&mut self, buf: &[u8]) -> Result<usize>;
 
-    async fn flush(&mut self) -> std::io::Result<()>;
+    async fn flush(&mut self) -> Result<()>;
 }
 
 pub trait Seek {
-    async fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64>;
+    async fn seek(&mut self, pos: SeekFrom) -> Result<u64>;
 }
