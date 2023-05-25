@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{future::Future, io::Result};
+use std::{
+    any::Any,
+    future::Future,
+    io::Result,
+    pin::{pin, Pin},
+    result,
+    task::{Context, Poll},
+};
 
 pub(crate) struct Builder;
 
@@ -35,6 +42,21 @@ impl Runtime {
 }
 
 pub struct JoinHandle<T>(async_std::task::JoinHandle<T>);
+
+impl<T> JoinHandle<T> {
+    #[inline]
+    pub async fn cancel(self) -> Option<T> {
+        self.0.cancel().await
+    }
+}
+
+impl<T> Future for JoinHandle<T> {
+    type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
+
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        pin!(&mut self.0).poll(cx).map(|t| Ok(t))
+    }
+}
 
 #[inline]
 pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {

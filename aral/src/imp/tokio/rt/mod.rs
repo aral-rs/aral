@@ -13,7 +13,13 @@
 // limitations under the License.
 
 use cfg_if::cfg_if;
-use std::future::Future;
+use std::{
+    any::Any,
+    future::Future,
+    pin::{pin, Pin},
+    result,
+    task::{Context, Poll},
+};
 
 pub struct Builder(tokio::runtime::Builder);
 
@@ -53,6 +59,23 @@ impl Runtime {
 }
 
 pub struct JoinHandle<T>(tokio::task::JoinHandle<T>);
+
+impl<T> JoinHandle<T> {
+    pub async fn cancel(self) -> Option<T> {
+        self.0.abort();
+        self.0.await.ok()
+    }
+}
+
+impl<T> Future for JoinHandle<T> {
+    type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
+
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        pin!(&mut self.0)
+            .poll(cx)
+            .map(|r| r.map_err(|err| err.into_panic()))
+    }
+}
 
 #[inline]
 pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {

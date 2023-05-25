@@ -13,7 +13,13 @@
 // limitations under the License.
 
 use crate::imp;
-use std::future::Future;
+use std::{
+    any::Any,
+    future::Future,
+    pin::{pin, Pin},
+    result,
+    task::{Context, Poll},
+};
 
 pub struct Builder(imp::rt::Builder);
 
@@ -42,6 +48,21 @@ impl Runtime {
 }
 
 pub struct JoinHandle<T>(imp::rt::JoinHandle<T>);
+
+impl<T> JoinHandle<T> {
+    #[inline]
+    pub async fn cancel(self) -> Option<T> {
+        self.0.cancel().await
+    }
+}
+
+impl<T> Future for JoinHandle<T> {
+    type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
+
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        Future::poll(pin!(&mut self.0), cx)
+    }
+}
 
 #[inline]
 pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
