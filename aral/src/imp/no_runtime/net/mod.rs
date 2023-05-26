@@ -16,7 +16,10 @@ use crate::{
     io::{Read, Write},
     net::ToSocketAddrs,
 };
-use std::{io::Result, net::SocketAddr};
+use std::{
+    io::Result,
+    net::{Ipv4Addr, Ipv6Addr, SocketAddr},
+};
 
 pub struct TcpStream;
 
@@ -82,6 +85,102 @@ impl TcpListener {
     }
 
     pub fn local_addr(&self) -> Result<SocketAddr> {
+        no_runtime_specified!();
+    }
+}
+
+pub struct UdpSocket;
+
+impl UdpSocket {
+    pub async fn bind(_addr: impl ToSocketAddrs) -> Result<UdpSocket> {
+        no_runtime_specified!();
+    }
+
+    pub fn broadcast(&self) -> Result<bool> {
+        no_runtime_specified!();
+    }
+
+    pub async fn connect(&self, _addr: impl ToSocketAddrs) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn join_multicast_v4(&self, _multiaddr: &Ipv4Addr, _interface: &Ipv4Addr) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn join_multicast_v6(&self, _multiaddr: &Ipv6Addr, _interface: u32) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn leave_multicast_v4(&self, _multiaddr: &Ipv4Addr, _interface: &Ipv4Addr) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn leave_multicast_v6(&self, _multiaddr: &Ipv6Addr, _interface: u32) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn local_addr(&self) -> Result<SocketAddr> {
+        no_runtime_specified!();
+    }
+
+    pub fn multicast_loop_v4(&self) -> Result<bool> {
+        no_runtime_specified!();
+    }
+
+    pub fn multicast_loop_v6(&self) -> Result<bool> {
+        no_runtime_specified!();
+    }
+
+    pub fn multicast_ttl_v4(&self) -> Result<u32> {
+        no_runtime_specified!();
+    }
+
+    pub async fn peek_from(&self, _buf: &mut [u8]) -> Result<(usize, SocketAddr)> {
+        no_runtime_specified!();
+    }
+
+    pub fn peer_addr(&self) -> Result<SocketAddr> {
+        no_runtime_specified!();
+    }
+
+    pub async fn recv(&self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+
+    pub async fn recv_from(&self, _buf: &mut [u8]) -> Result<(usize, SocketAddr)> {
+        no_runtime_specified!();
+    }
+
+    pub async fn send(&self, _buf: &[u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+
+    pub async fn send_to(&self, _buf: &[u8], _target: impl ToSocketAddrs) -> Result<usize> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_broadcast(&self, _on: bool) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_multicast_loop_v4(&self, _on: bool) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_multicast_loop_v6(&self, _on: bool) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_multicast_ttl_v4(&self, _ttl: u32) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_ttl(&self, _ttl: u32) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn ttl(&self) -> Result<u32> {
         no_runtime_specified!();
     }
 }

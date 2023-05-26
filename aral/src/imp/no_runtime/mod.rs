@@ -20,5 +20,6 @@ macro_rules! no_runtime_specified {
 
 pub mod fs;
 pub mod net;
+pub mod os;
 pub mod rt;
 pub mod time;
