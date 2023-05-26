@@ -35,6 +35,31 @@ impl TcpStream {
     pub fn peer_addr(&self) -> Result<SocketAddr> {
         self.0.peer_addr()
     }
+
+    #[inline]
+    pub fn nodelay(&self) -> Result<bool> {
+        self.0.nodelay()
+    }
+
+    #[inline]
+    pub async fn peek(&self, buf: &mut [u8]) -> Result<usize> {
+        self.0.peek(buf).await
+    }
+
+    #[inline]
+    pub fn set_nodelay(&self, nodelay: bool) -> Result<()> {
+        self.0.set_nodelay(nodelay)
+    }
+
+    #[inline]
+    pub fn set_ttl(&self, ttl: u32) -> Result<()> {
+        self.0.set_ttl(ttl)
+    }
+
+    #[inline]
+    pub fn ttl(&self) -> Result<u32> {
+        self.0.ttl()
+    }
 }
 
 impl Read for TcpStream {

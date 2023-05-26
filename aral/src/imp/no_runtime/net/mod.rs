@@ -32,6 +32,26 @@ impl TcpStream {
     pub fn peer_addr(&self) -> Result<SocketAddr> {
         no_runtime_specified!();
     }
+
+    pub fn nodelay(&self) -> Result<bool> {
+        no_runtime_specified!();
+    }
+
+    pub async fn peek(&self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_nodelay(&self, _nodelay: bool) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn set_ttl(&self, _ttl: u32) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    pub fn ttl(&self) -> Result<u32> {
+        no_runtime_specified!();
+    }
 }
 
 impl Read for TcpStream {
