@@ -34,6 +34,41 @@ impl File {
     pub async fn open(path: impl AsRef<Path>) -> Result<File> {
         imp::fs::File::open(path).await.map(File)
     }
+
+    #[inline]
+    pub fn options() -> OpenOptions {
+        OpenOptions::new()
+    }
+
+    #[inline]
+    pub async fn metadata(&self) -> Result<Metadata> {
+        self.0.metadata().await
+    }
+
+    #[inline]
+    pub async fn set_len(&self, size: u64) -> Result<()> {
+        self.0.set_len(size).await
+    }
+
+    #[inline]
+    pub async fn set_permissions(&self, perm: Permissions) -> Result<()> {
+        self.0.set_permissions(perm).await
+    }
+
+    #[inline]
+    pub async fn sync_all(&self) -> Result<()> {
+        self.0.sync_all().await
+    }
+
+    #[inline]
+    pub async fn sync_data(&self) -> Result<()> {
+        self.0.sync_data().await
+    }
+
+    #[inline]
+    pub async fn try_clone(&self) -> Result<File> {
+        self.0.try_clone().await.map(File)
+    }
 }
 
 impl Read for File {
@@ -59,6 +94,62 @@ impl Seek for File {
     #[inline]
     async fn seek(&mut self, pos: SeekFrom) -> Result<u64> {
         Seek::seek(&mut self.0, pos).await
+    }
+}
+
+pub struct OpenOptions(imp::fs::OpenOptions);
+
+impl OpenOptions {
+    #[inline]
+    pub fn append(&mut self, append: bool) -> &mut OpenOptions {
+        self.0.append(append);
+        self
+    }
+
+    #[inline]
+    pub fn create(&mut self, create: bool) -> &mut OpenOptions {
+        self.0.create(create);
+        self
+    }
+
+    #[inline]
+    pub fn create_new(&mut self, create_new: bool) -> &mut OpenOptions {
+        self.0.create_new(create_new);
+        self
+    }
+
+    #[inline]
+    pub fn new() -> OpenOptions {
+        OpenOptions(imp::fs::OpenOptions::new())
+    }
+
+    #[inline]
+    pub async fn open(&self, path: impl AsRef<Path>) -> Result<File> {
+        self.0.open(path).await.map(File)
+    }
+
+    #[inline]
+    pub fn read(&mut self, read: bool) -> &mut OpenOptions {
+        self.0.read(read);
+        self
+    }
+
+    #[inline]
+    pub fn truncate(&mut self, truncate: bool) -> &mut OpenOptions {
+        self.0.truncate(truncate);
+        self
+    }
+
+    #[inline]
+    pub fn write(&mut self, write: bool) -> &mut OpenOptions {
+        self.0.write(write);
+        self
+    }
+}
+
+impl Default for OpenOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
