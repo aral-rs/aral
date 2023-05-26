@@ -14,6 +14,7 @@
 
 #![feature(async_fn_in_trait)]
 #![doc = include_str!("../README.md")]
+#![cfg_attr(docs_rs, feature(doc_cfg))]
 
 mod exp;
 mod imp;

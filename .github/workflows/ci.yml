@@ -111,5 +111,5 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           toolchain: nightly
-          command: doc
-          args: --workspace --release ${{ matrix.features }} --no-deps 
+          command: rustdoc
+          args: -p aral --release ${{ matrix.features }} -- --cfg docs_rs

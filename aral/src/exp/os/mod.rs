@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod fs;
-pub mod net;
-pub mod os;
-pub mod rt;
-pub mod time;
+#[cfg(unix)]
+#[cfg_attr(docs_rs, doc(cfg(unix)))]
+pub mod unix;
