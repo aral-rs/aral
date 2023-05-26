@@ -31,6 +31,36 @@ impl File {
     pub async fn open(_path: impl AsRef<Path>) -> Result<File> {
         no_runtime_specified!();
     }
+
+    #[inline]
+    pub async fn metadata(&self) -> Result<Metadata> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    pub async fn set_len(&self, _size: u64) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    pub async fn set_permissions(&self, _perm: Permissions) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    pub async fn sync_all(&self) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    pub async fn sync_data(&self) -> Result<()> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    pub async fn try_clone(&self) -> Result<File> {
+        no_runtime_specified!();
+    }
 }
 
 impl Read for File {
@@ -51,6 +81,42 @@ impl Write for File {
 
 impl Seek for File {
     async fn seek(&mut self, _pos: SeekFrom) -> Result<u64> {
+        no_runtime_specified!();
+    }
+}
+
+pub struct OpenOptions;
+
+impl OpenOptions {
+    pub fn append(&mut self, _append: bool) -> &mut OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub fn create(&mut self, _create: bool) -> &mut OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub fn create_new(&mut self, _create_new: bool) -> &mut OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub fn new() -> OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub async fn open(&self, _path: impl AsRef<Path>) -> Result<File> {
+        no_runtime_specified!();
+    }
+
+    pub fn read(&mut self, _read: bool) -> &mut OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub fn truncate(&mut self, _truncate: bool) -> &mut OpenOptions {
+        no_runtime_specified!();
+    }
+
+    pub fn write(&mut self, _write: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 }
