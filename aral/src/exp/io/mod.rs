@@ -21,7 +21,7 @@ pub trait Read {
 pub trait BufRead: Read {
     async fn fill_buf(&mut self) -> Result<&[u8]>;
 
-    async fn consume(&mut self, amt: usize);
+    fn consume(&mut self, amt: usize);
 }
 
 pub trait Write {
