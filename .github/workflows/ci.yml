@@ -90,7 +90,6 @@ jobs:
       - name: Cargo fmt
         uses: actions-rs/cargo@v1
         with:
-          toolchain: nightly
           command: fmt
           args: --all -- --check
 
@@ -105,11 +104,10 @@ jobs:
         if: matrix.features != ''
         with:
           command: test
-          args: --workspace  --release ${{ matrix.features }} -- --nocapture
+          args: --workspace --release ${{ matrix.features }} -- --nocapture
 
       - name: Cargo doc
         uses: actions-rs/cargo@v1
         with:
-          toolchain: nightly
           command: rustdoc
           args: -p aral --release ${{ matrix.features }} -- --cfg docs_rs
