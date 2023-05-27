@@ -13,5 +13,5 @@
 # limitations under the License.
 
 [toolchain]
-channel = "nightly"
+channel = "nightly-2023-05-19"
 components = ["clippy", "rustfmt", "rust-analyzer"]
