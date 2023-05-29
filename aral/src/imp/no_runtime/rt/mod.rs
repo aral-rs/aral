@@ -14,22 +14,30 @@
 
 use std::future::Future;
 
-pub(crate) struct Builder;
+pub struct Builder;
 
 impl Builder {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         no_runtime_specified!();
     }
 
-    pub(crate) fn build(self) -> std::io::Result<Runtime> {
+    pub fn thread_name(self, _name: impl Into<String>) -> Self {
+        no_runtime_specified!();
+    }
+
+    pub fn worker_threads(self, _val: usize) -> Self {
+        no_runtime_specified!();
+    }
+
+    pub fn build(self) -> std::io::Result<Runtime> {
         no_runtime_specified!();
     }
 }
 
-pub(crate) struct Runtime;
+pub struct Runtime;
 
 impl Runtime {
-    pub(crate) fn block_on<F: Future>(self, _future: F) -> F::Output {
+    pub fn block_on<F: Future>(self, _future: F) -> F::Output {
         no_runtime_specified!();
     }
 }

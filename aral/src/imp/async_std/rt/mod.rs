@@ -14,22 +14,44 @@
 
 use std::{future::Future, io::Result};
 
-pub(crate) struct Builder;
+pub struct Builder {
+    thread_name: Option<String>,
+    worker_threads: Option<usize>,
+}
 
 impl Builder {
-    pub(crate) fn new() -> Self {
-        Self
+    pub fn new() -> Self {
+        Self {
+            thread_name: None,
+            worker_threads: None,
+        }
     }
 
-    pub(crate) fn build(self) -> Result<Runtime> {
+    pub fn thread_name(mut self, name: impl Into<String>) -> Self {
+        self.thread_name = Some(name.into());
+        self
+    }
+
+    pub fn worker_threads(mut self, val: usize) -> Self {
+        self.worker_threads = Some(val);
+        self
+    }
+
+    pub fn build(self) -> Result<Runtime> {
+        if let Some(thread_name) = self.thread_name {
+            std::env::set_var("ASYNC_STD_THREAD_NAME", thread_name);
+        }
+        if let Some(worker_threads) = self.worker_threads {
+            std::env::set_var("ASYNC_STD_THREAD_COUNT", worker_threads.to_string());
+        }
         Ok(Runtime(async_std::task::Builder::new()))
     }
 }
 
-pub(crate) struct Runtime(async_std::task::Builder);
+pub struct Runtime(async_std::task::Builder);
 
 impl Runtime {
-    pub(crate) fn block_on<F: Future>(self, future: F) -> F::Output {
+    pub fn block_on<F: Future>(self, future: F) -> F::Output {
         self.0.blocking(future)
     }
 }

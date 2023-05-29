@@ -39,6 +39,16 @@ impl Builder {
         Self(builder)
     }
 
+    pub fn thread_name(mut self, name: impl Into<String>) -> Self {
+        self.0.thread_name(name);
+        self
+    }
+
+    pub fn worker_threads(mut self, val: usize) -> Self {
+        self.0.worker_threads(val);
+        self
+    }
+
     pub fn build(mut self) -> std::io::Result<Runtime> {
         self.0.build().map(Runtime)
     }
