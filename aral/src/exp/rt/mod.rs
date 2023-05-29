@@ -22,6 +22,14 @@ impl Builder {
         Self(imp::rt::Builder::new())
     }
 
+    pub fn thread_name(self, name: impl Into<String>) -> Self {
+        Builder(self.0.thread_name(name))
+    }
+
+    pub fn worker_threads(self, val: usize) -> Self {
+        Builder(self.0.worker_threads(val))
+    }
+
     pub fn build(self) -> std::io::Result<Runtime> {
         self.0.build().map(Runtime)
     }
