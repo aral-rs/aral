@@ -18,7 +18,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 authors = ["ARAL Development Team", "jmjoy <jmjoy@apache.org>"]
 edition = "2021"
 license = "Apache-2.0"
