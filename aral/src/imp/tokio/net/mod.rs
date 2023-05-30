@@ -12,19 +12,123 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    io::{Read, Write},
-    net::ToSocketAddrs,
-};
+use crate::io::{Read, Write};
 use std::{
     io::Result,
-    net::{Ipv4Addr, Ipv6Addr, SocketAddr},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
+use tokio::net::lookup_host;
+
+pub trait ToSocketAddrs {
+    type Iter: Iterator<Item = SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<Self::Iter>;
+}
+
+impl ToSocketAddrs for (&str, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().collect::<Vec<_>>().into_iter())
+    }
+}
+
+impl ToSocketAddrs for (IpAddr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
+
+impl ToSocketAddrs for (String, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().collect::<Vec<_>>().into_iter())
+    }
+}
+
+impl ToSocketAddrs for (Ipv4Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
+
+impl ToSocketAddrs for (Ipv6Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
+
+impl ToSocketAddrs for SocketAddr {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
+
+impl ToSocketAddrs for str {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().collect::<Vec<_>>().into_iter())
+    }
+}
+
+impl ToSocketAddrs for String {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().collect::<Vec<_>>().into_iter())
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV4 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV6 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        lookup_host(self)
+            .await
+            .map(|it| it.into_iter().next().into_iter())
+    }
+}
 
 pub struct TcpStream(tokio::net::TcpStream);
 
 impl TcpStream {
-    pub async fn connect(addr: impl ToSocketAddrs) -> Result<TcpStream> {
+    pub async fn connect(addr: impl crate::net::ToSocketAddrs) -> Result<TcpStream> {
         let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
         tokio::net::TcpStream::connect(&*addrs).await.map(TcpStream)
     }
@@ -91,7 +195,7 @@ impl TcpListener {
             .map(|(stream, addr)| (TcpStream(stream), addr))
     }
 
-    pub async fn bind(addr: impl ToSocketAddrs) -> Result<Self> {
+    pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<Self> {
         let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
         tokio::net::TcpListener::bind(&*addrs)
             .await
@@ -107,7 +211,7 @@ impl TcpListener {
 pub struct UdpSocket(tokio::net::UdpSocket);
 
 impl UdpSocket {
-    pub async fn bind(addr: impl ToSocketAddrs) -> Result<UdpSocket> {
+    pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<UdpSocket> {
         let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
         tokio::net::UdpSocket::bind(&*addrs).await.map(UdpSocket)
     }
@@ -117,7 +221,7 @@ impl UdpSocket {
         self.0.broadcast()
     }
 
-    pub async fn connect(&self, addr: impl ToSocketAddrs) -> Result<()> {
+    pub async fn connect(&self, addr: impl crate::net::ToSocketAddrs) -> Result<()> {
         let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
         self.0.connect(&*addrs).await
     }
@@ -187,7 +291,9 @@ impl UdpSocket {
         self.0.send(buf).await
     }
 
-    pub async fn send_to(&self, buf: &[u8], target: impl ToSocketAddrs) -> Result<usize> {
+    pub async fn send_to(
+        &self, buf: &[u8], target: impl crate::net::ToSocketAddrs,
+    ) -> Result<usize> {
         let target = target.to_socket_addrs().await?.collect::<Vec<_>>();
         self.0.send_to(buf, &*target).await
     }

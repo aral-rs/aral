@@ -12,19 +12,102 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    io::{Read, Write},
-    net::ToSocketAddrs,
-};
+use crate::io::{Read, Write};
 use std::{
     io::Result,
-    net::{Ipv4Addr, Ipv6Addr, SocketAddr},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
+
+pub trait ToSocketAddrs {
+    type Iter: Iterator<Item = SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<Self::Iter>;
+}
+
+impl ToSocketAddrs for (&str, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for (IpAddr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for (String, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for (Ipv4Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for (Ipv6Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for SocketAddr {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for str {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for String {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV4 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV6 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        no_runtime_specified!();
+    }
+}
 
 pub struct TcpStream;
 
 impl TcpStream {
-    pub async fn connect(_addr: impl ToSocketAddrs) -> Result<TcpStream> {
+    pub async fn connect(_addr: impl crate::net::ToSocketAddrs) -> Result<TcpStream> {
         no_runtime_specified!();
     }
 
@@ -80,7 +163,7 @@ impl TcpListener {
         no_runtime_specified!();
     }
 
-    pub async fn bind(_addr: impl ToSocketAddrs) -> Result<Self> {
+    pub async fn bind(_addr: impl crate::net::ToSocketAddrs) -> Result<Self> {
         no_runtime_specified!();
     }
 
@@ -92,7 +175,7 @@ impl TcpListener {
 pub struct UdpSocket;
 
 impl UdpSocket {
-    pub async fn bind(_addr: impl ToSocketAddrs) -> Result<UdpSocket> {
+    pub async fn bind(_addr: impl crate::net::ToSocketAddrs) -> Result<UdpSocket> {
         no_runtime_specified!();
     }
 
@@ -100,7 +183,7 @@ impl UdpSocket {
         no_runtime_specified!();
     }
 
-    pub async fn connect(&self, _addr: impl ToSocketAddrs) -> Result<()> {
+    pub async fn connect(&self, _addr: impl crate::net::ToSocketAddrs) -> Result<()> {
         no_runtime_specified!();
     }
 
@@ -156,7 +239,9 @@ impl UdpSocket {
         no_runtime_specified!();
     }
 
-    pub async fn send_to(&self, _buf: &[u8], _target: impl ToSocketAddrs) -> Result<usize> {
+    pub async fn send_to(
+        &self, _buf: &[u8], _target: impl crate::net::ToSocketAddrs,
+    ) -> Result<usize> {
         no_runtime_specified!();
     }
 
