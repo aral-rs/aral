@@ -18,14 +18,109 @@ use crate::{
 };
 use std::{
     io::Result,
-    net::{Ipv4Addr, Ipv6Addr, SocketAddr},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
 pub trait ToSocketAddrs {
     type Iter: Iterator<Item = SocketAddr>;
 
-    // Required method
     async fn to_socket_addrs(&self) -> Result<Self::Iter>;
+}
+
+impl ToSocketAddrs for (&str, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for (IpAddr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for (String, u16) {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for (Ipv4Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for (Ipv6Addr, u16) {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for SocketAddr {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for str {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for String {
+    type Iter = std::vec::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV4 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl ToSocketAddrs for SocketAddrV6 {
+    type Iter = std::option::IntoIter<SocketAddr>;
+
+    async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
+        imp::net::ToSocketAddrs::to_socket_addrs(self).await
+    }
+}
+
+impl<'a> ToSocketAddrs for &'a [SocketAddr] {
+    type Iter = std::iter::Cloned<std::slice::Iter<'a, SocketAddr>>;
+
+    async fn to_socket_addrs(&self) -> Result<std::iter::Cloned<std::slice::Iter<'a, SocketAddr>>> {
+        Ok(self.iter().cloned())
+    }
+}
+
+impl<T: ToSocketAddrs + ?Sized> ToSocketAddrs for &T {
+    type Iter = <T as ToSocketAddrs>::Iter;
+
+    async fn to_socket_addrs(&self) -> Result<<T as ToSocketAddrs>::Iter> {
+        (**self).to_socket_addrs().await
+    }
 }
 
 pub struct TcpStream(imp::net::TcpStream);
