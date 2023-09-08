@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[workspace]
-members = [
-    "aral",
-]
-
-[workspace.package]
-version = "0.1.0-alpha.2"
+[package]
+name = "aral"
+description = "Async Runtime Aggregation Layer."
+version = "0.1.0-dev"
 authors = ["ARAL Development Team", "jmjoy <jmjoy@apache.org>"]
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/jmjoy/aral.git"
+
+[features]
+runtime-tokio-current-thread = ["tokio"]
+runtime-tokio-multi-thread = ["tokio", "tokio/rt-multi-thread"]
+runtime-async-std = ["async-std"]
+
+[dependencies]
+async-std = { version = "1.12.0", optional = true }
+cfg-if = "1.0.0"
+tokio = { version = "1.28.1", features = ["fs", "io-util", "net", "time", "rt"], optional = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docs_rs"]
