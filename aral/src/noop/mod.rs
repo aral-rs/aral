@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use aral::{rt::Builder, task::sleep};
-use std::time::Duration;
-
-#[test]
-fn test_sleep() {
-    let runtime = Builder::new().build().unwrap();
-    runtime.block_on(async move {
-        sleep(Duration::from_secs(1)).await;
-    });
+macro_rules! no_runtime_specified {
+    () => {
+        panic!("no runtime specified, please enable one of `runtime-*` features");
+    };
 }
+
+pub mod fs;
+pub mod net;
+pub mod os;
+pub mod task;
