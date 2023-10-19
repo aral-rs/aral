@@ -1,29 +1,21 @@
-use crate::{
-    imp,
-    io::{Read, Seek, Write},
-};
+use crate::io::{Read, Seek, Write};
 use std::{
     fs::{Metadata, Permissions},
     io::{Result, SeekFrom},
     path::{Path, PathBuf},
 };
 
-pub struct File(imp::fs::File);
+pub struct File(async_std::fs::File);
 
 impl File {
     #[inline]
     pub async fn create(path: impl AsRef<Path>) -> Result<File> {
-        imp::fs::File::create(path).await.map(File)
+        async_std::fs::File::create(path.as_ref()).await.map(File)
     }
 
     #[inline]
     pub async fn open(path: impl AsRef<Path>) -> Result<File> {
-        imp::fs::File::open(path).await.map(File)
-    }
-
-    #[inline]
-    pub fn options() -> OpenOptions {
-        OpenOptions::new()
+        async_std::fs::File::open(path.as_ref()).await.map(File)
     }
 
     #[inline]
@@ -53,37 +45,37 @@ impl File {
 
     #[inline]
     pub async fn try_clone(&self) -> Result<File> {
-        self.0.try_clone().await.map(File)
+        Ok(File(self.0.clone()))
     }
 }
 
 impl Read for File {
     #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        imp::io::Read::read(&mut self.0, buf).await
+        async_std::io::ReadExt::read(&mut self.0, buf).await
     }
 }
 
 impl Write for File {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        imp::io::Write::write(&mut self.0, buf).await
+        async_std::io::WriteExt::write(&mut self.0, buf).await
     }
 
     #[inline]
     async fn flush(&mut self) -> Result<()> {
-        imp::io::Write::flush(&mut self.0).await
+        async_std::io::WriteExt::flush(&mut self.0).await
     }
 }
 
 impl Seek for File {
     #[inline]
     async fn seek(&mut self, pos: SeekFrom) -> Result<u64> {
-        imp::io::Seek::seek(&mut self.0, pos).await
+        async_std::io::prelude::SeekExt::seek(&mut self.0, pos).await
     }
 }
 
-pub struct OpenOptions(imp::fs::OpenOptions);
+pub struct OpenOptions(async_std::fs::OpenOptions);
 
 impl OpenOptions {
     #[inline]
@@ -106,12 +98,12 @@ impl OpenOptions {
 
     #[inline]
     pub fn new() -> OpenOptions {
-        OpenOptions(imp::fs::OpenOptions::new())
+        OpenOptions(async_std::fs::OpenOptions::new())
     }
 
     #[inline]
     pub async fn open(&self, path: impl AsRef<Path>) -> Result<File> {
-        self.0.open(path).await.map(File)
+        self.0.open(path.as_ref()).await.map(File)
     }
 
     #[inline]
@@ -133,89 +125,110 @@ impl OpenOptions {
     }
 }
 
-impl Default for OpenOptions {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[inline]
 pub async fn canonicalize(path: impl AsRef<Path>) -> Result<PathBuf> {
-    imp::fs::canonicalize(path).await
+    async_std::fs::canonicalize(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn copy(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<u64> {
-    imp::fs::copy(from, to).await
+    async_std::fs::copy(from.as_ref(), to.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn create_dir(path: impl AsRef<Path>) -> Result<()> {
-    imp::fs::create_dir(path).await
+    async_std::fs::create_dir(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn create_dir_all(path: impl AsRef<Path>) -> Result<()> {
-    imp::fs::create_dir_all(path).await
+    async_std::fs::create_dir_all(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn hard_link(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> Result<()> {
-    imp::fs::hard_link(src, dst).await
+    async_std::fs::hard_link(src.as_ref(), dst.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn metadata(path: impl AsRef<Path>) -> Result<Metadata> {
-    imp::fs::metadata(path).await
+    async_std::fs::metadata(path.as_ref()).await.map(Into::into)
 }
 
 #[inline]
 pub async fn read(path: impl AsRef<Path>) -> Result<Vec<u8>> {
-    imp::fs::read(path).await
+    async_std::fs::read(path.as_ref()).await.map(Into::into)
 }
 
 #[inline]
 pub async fn read_link(path: impl AsRef<Path>) -> Result<PathBuf> {
-    imp::fs::read_link(path).await
+    async_std::fs::read_link(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn read_to_string(path: impl AsRef<Path>) -> Result<String> {
-    imp::fs::read_to_string(path).await
+    async_std::fs::read_to_string(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn remove_dir(path: impl AsRef<Path>) -> Result<()> {
-    imp::fs::remove_dir(path).await
+    async_std::fs::remove_dir(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn remove_dir_all(path: impl AsRef<Path>) -> Result<()> {
-    imp::fs::remove_dir_all(path).await
+    async_std::fs::remove_dir_all(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn remove_file(path: impl AsRef<Path>) -> Result<()> {
-    imp::fs::remove_file(path).await
+    async_std::fs::remove_file(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn rename(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
-    imp::fs::rename(from, to).await
+    async_std::fs::rename(from.as_ref(), to.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn set_permissions(path: impl AsRef<Path>, perm: Permissions) -> Result<()> {
-    imp::fs::set_permissions(path, perm).await
+    async_std::fs::set_permissions(path.as_ref(), perm)
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn symlink_metadata(path: impl AsRef<Path>) -> Result<Metadata> {
-    imp::fs::symlink_metadata(path).await
+    async_std::fs::symlink_metadata(path.as_ref())
+        .await
+        .map(Into::into)
 }
 
 #[inline]
 pub async fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
-    imp::fs::write(path, contents).await
+    async_std::fs::write(path.as_ref(), contents)
+        .await
+        .map(Into::into)
 }

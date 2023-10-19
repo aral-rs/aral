@@ -8,8 +8,7 @@ It lets you switch the executors smooth and easy without having to change your a
 **Note**: Libraries should not enable any runtime feature. You can choose the executor, by using cargo features.
 There can only be one enabled runtime. Valid features are:
 
-- **runtime-tokio-current-thread**
-- **runtime-tokio-multi-thread**
+- **runtime-tokio**
 - **runtime-async-std**
 
 ## Principle

@@ -1,30 +1,8 @@
-// Copyright 2023 ARAL Development Team
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-use crate::{
-    imp::{
-        self,
-        os::unix::net::{
-            UnixDatagram as ImpUnixDatagram, UnixListener as ImpUnixListener,
-            UnixStream as ImpUnixStream,
-        },
-    },
-    io::{Read, Write},
-};
+use crate::io::{Read, Write};
 use std::{io::Result, net::Shutdown, path::Path};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-pub struct SocketAddr(imp::os::unix::net::SocketAddr);
+pub struct SocketAddr(tokio::net::unix::SocketAddr);
 
 impl SocketAddr {
     #[inline]
@@ -38,16 +16,16 @@ impl SocketAddr {
     }
 }
 
-pub struct UnixDatagram(ImpUnixDatagram);
+pub struct UnixDatagram(tokio::net::UnixDatagram);
 
 impl UnixDatagram {
     pub async fn bind(path: impl AsRef<Path>) -> Result<Self> {
-        ImpUnixDatagram::bind(path).await.map(UnixDatagram)
+        tokio::net::UnixDatagram::bind(path).map(UnixDatagram)
     }
 
     #[inline]
     pub async fn connect(&self, path: impl AsRef<Path>) -> Result<()> {
-        self.0.connect(path).await
+        self.0.connect(path)
     }
 
     #[inline]
@@ -56,7 +34,8 @@ impl UnixDatagram {
     }
 
     pub fn pair() -> Result<(UnixDatagram, UnixDatagram)> {
-        ImpUnixDatagram::pair().map(|(a, b)| (UnixDatagram(a), UnixDatagram(b)))
+        let (a, b) = tokio::net::UnixDatagram::pair()?;
+        Ok((UnixDatagram(a), UnixDatagram(b)))
     }
 
     #[inline]
@@ -94,15 +73,15 @@ impl UnixDatagram {
 
     #[inline]
     pub fn unbound() -> Result<UnixDatagram> {
-        ImpUnixDatagram::unbound().map(UnixDatagram)
+        tokio::net::UnixDatagram::unbound().map(UnixDatagram)
     }
 }
 
-pub struct UnixStream(ImpUnixStream);
+pub struct UnixStream(tokio::net::UnixStream);
 
 impl UnixStream {
     pub async fn connect(path: impl AsRef<Path>) -> Result<UnixStream> {
-        ImpUnixStream::connect(path).await.map(UnixStream)
+        tokio::net::UnixStream::connect(path).await.map(UnixStream)
     }
 
     pub fn local_addr(&self) -> Result<SocketAddr> {
@@ -110,7 +89,7 @@ impl UnixStream {
     }
 
     pub fn pair() -> Result<(UnixStream, UnixStream)> {
-        ImpUnixStream::pair().map(|(a, b)| (UnixStream(a), UnixStream(b)))
+        tokio::net::UnixStream::pair().map(|(a, b)| (UnixStream(a), UnixStream(b)))
     }
 
     pub fn peer_addr(&self) -> Result<SocketAddr> {
@@ -119,25 +98,22 @@ impl UnixStream {
 }
 
 impl Read for UnixStream {
-    #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        imp::io::Read::read(&mut self.0, buf).await
+        AsyncReadExt::read(&mut self.0, buf).await
     }
 }
 
 impl Write for UnixStream {
-    #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        imp::io::Write::write(&mut self.0, buf).await
+        AsyncWriteExt::write(&mut self.0, buf).await
     }
 
-    #[inline]
     async fn flush(&mut self) -> Result<()> {
-        imp::io::Write::flush(&mut self.0).await
+        AsyncWriteExt::flush(&mut self.0).await
     }
 }
 
-pub struct UnixListener(ImpUnixListener);
+pub struct UnixListener(tokio::net::UnixListener);
 
 impl UnixListener {
     pub async fn accept(&self) -> Result<(UnixStream, SocketAddr)> {
@@ -148,7 +124,7 @@ impl UnixListener {
     }
 
     pub async fn bind(path: impl AsRef<Path>) -> Result<UnixListener> {
-        ImpUnixListener::bind(path).await.map(UnixListener)
+        tokio::net::UnixListener::bind(path).map(UnixListener)
     }
 
     pub fn local_addr(&self) -> Result<SocketAddr> {

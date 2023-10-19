@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
   "aral",
-  "runtimes/*",
+  "aral-runtimes/*",
 #   "tests/*",
 ]
 
@@ -13,6 +13,6 @@ license = "Apache-2.0 OR MIT OR MulanPSL-2.0"
 repository = "https://github.com/aral-rs/aral.git"
 
 [workspace.dependencies]
-aral = { version = "0.1.0-alpha.3", path = "./aral" }
-aral-runtime-tokio = { version = "0.1.0-alpha.3", path = "./runtimes/tokio" }
-aral-runtime-async-std = { version = "0.1.0-alpha.3", path = "./runtimes/async-std" }
+aral-runtime-tokio = { version = "0.1.0-alpha.3", path = "./aral-runtimes/tokio" }
+aral-runtime-async-std = { version = "0.1.0-alpha.3", path = "./aral-runtimes/async-std" }
+aral-runtime-noop = { version = "0.1.0-alpha.3", path = "./aral-runtimes/noop" }

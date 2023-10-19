@@ -1,4 +1,3 @@
-use crate::imp;
 use std::{
     any::Any,
     future::Future,
@@ -10,34 +9,34 @@ use std::{
 
 #[inline]
 pub async fn sleep(duration: Duration) {
-    imp::task::sleep(duration).await
+    tokio::time::sleep(duration).await
 }
 
-pub struct JoinHandle<T>(imp::task::JoinHandle<T>);
+pub struct JoinHandle<T>(tokio::task::JoinHandle<T>);
 
 impl<T> JoinHandle<T> {
-    #[inline]
     pub async fn cancel(self) -> Option<T> {
-        self.0.cancel().await
+        self.0.abort();
+        self.0.await.ok()
     }
 }
 
-pub type Result<T> = result::Result<T, Box<dyn Any + Send + 'static>>;
-
 impl<T> Future for JoinHandle<T> {
-    type Output = Result<T>;
+    type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        Future::poll(pin!(&mut self.0), cx)
+        pin!(&mut self.0)
+            .poll(cx)
+            .map(|r| r.map_err(|err| err.into_panic()))
     }
 }
 
 #[inline]
 pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> JoinHandle<T> {
-    JoinHandle(imp::task::spawn(future))
+    JoinHandle(tokio::spawn(future))
 }
 
 #[inline]
 pub fn spawn_blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> JoinHandle<T> {
-    JoinHandle(imp::task::spawn_blocking(f))
+    JoinHandle(tokio::task::spawn_blocking(f))
 }
