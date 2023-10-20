@@ -69,7 +69,7 @@ edition = "2021"
 [dependencies]
 aral = { version = "*", features = ["runtime-tokio"], default-features = false }
 tokio = { version = "1.33.0", features = ["full"] }
-foo = 0.1.0
+foo = "0.1.0"
 ```
 
 ```rust, ignore
