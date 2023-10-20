@@ -136,7 +136,7 @@ impl OpenOptions {
 impl Default for OpenOptions {
     #[inline]
     fn default() -> Self {
-        Self::new()
+        Self(Default::default())
     }
 }
 

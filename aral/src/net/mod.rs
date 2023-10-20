@@ -16,6 +16,7 @@ pub trait ToSocketAddrs: imp::net::ToSocketAddrs {
 impl ToSocketAddrs for (&str, u16) {
     type Iter = std::vec::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -24,15 +25,8 @@ impl ToSocketAddrs for (&str, u16) {
 impl ToSocketAddrs for (IpAddr, u16) {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
-        imp::net::ToSocketAddrs::to_socket_addrs(self).await
-    }
-}
-
-impl ToSocketAddrs for (String, u16) {
-    type Iter = std::vec::IntoIter<SocketAddr>;
-
-    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
 }
@@ -40,6 +34,7 @@ impl ToSocketAddrs for (String, u16) {
 impl ToSocketAddrs for (Ipv4Addr, u16) {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -48,6 +43,7 @@ impl ToSocketAddrs for (Ipv4Addr, u16) {
 impl ToSocketAddrs for (Ipv6Addr, u16) {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -56,6 +52,7 @@ impl ToSocketAddrs for (Ipv6Addr, u16) {
 impl ToSocketAddrs for SocketAddr {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -64,6 +61,7 @@ impl ToSocketAddrs for SocketAddr {
 impl ToSocketAddrs for str {
     type Iter = std::vec::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -72,6 +70,7 @@ impl ToSocketAddrs for str {
 impl ToSocketAddrs for String {
     type Iter = std::vec::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -80,6 +79,7 @@ impl ToSocketAddrs for String {
 impl ToSocketAddrs for SocketAddrV4 {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -88,6 +88,7 @@ impl ToSocketAddrs for SocketAddrV4 {
 impl ToSocketAddrs for SocketAddrV6 {
     type Iter = std::option::IntoIter<SocketAddr>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::option::IntoIter<SocketAddr>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -96,6 +97,7 @@ impl ToSocketAddrs for SocketAddrV6 {
 impl<'a> ToSocketAddrs for &'a [SocketAddr] {
     type Iter = std::iter::Cloned<std::slice::Iter<'a, SocketAddr>>;
 
+    #[inline]
     async fn to_socket_addrs(&self) -> Result<std::iter::Cloned<std::slice::Iter<'a, SocketAddr>>> {
         imp::net::ToSocketAddrs::to_socket_addrs(self).await
     }
@@ -146,16 +148,19 @@ impl TcpStream {
 }
 
 impl Read for TcpStream {
+    #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         imp::io::Read::read(&mut self.0, buf).await
     }
 }
 
 impl Write for TcpStream {
+    #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
         imp::io::Write::write(&mut self.0, buf).await
     }
 
+    #[inline]
     async fn flush(&mut self) -> Result<()> {
         imp::io::Write::flush(&mut self.0).await
     }
@@ -186,6 +191,7 @@ impl TcpListener {
 pub struct UdpSocket(imp::net::UdpSocket);
 
 impl UdpSocket {
+    #[inline]
     pub async fn bind(addr: impl ToSocketAddrs) -> Result<UdpSocket> {
         imp::net::UdpSocket::bind(addr).await.map(UdpSocket)
     }

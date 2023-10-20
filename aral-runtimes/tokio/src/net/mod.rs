@@ -5,10 +5,10 @@ use std::{
 };
 use tokio::net::lookup_host;
 
-pub trait ToSocketAddrs {
+pub trait ToSocketAddrs: tokio::net::ToSocketAddrs {
     type Iter: Iterator<Item = SocketAddr>;
 
-    fn to_socket_addrs(&self) -> impl std::future::Future<Output = Result<Self::Iter>> + Send;
+    fn to_socket_addrs(&self) -> impl std::future::Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
 }
 
 impl ToSocketAddrs for (&str, u16) {
@@ -28,16 +28,6 @@ impl ToSocketAddrs for (IpAddr, u16) {
         lookup_host(self)
             .await
             .map(|it| it.into_iter().next().into_iter())
-    }
-}
-
-impl ToSocketAddrs for (String, u16) {
-    type Iter = std::vec::IntoIter<SocketAddr>;
-
-    async fn to_socket_addrs(&self) -> Result<std::vec::IntoIter<SocketAddr>> {
-        lookup_host(self)
-            .await
-            .map(|it| it.into_iter().collect::<Vec<_>>().into_iter())
     }
 }
 
@@ -123,8 +113,7 @@ pub struct TcpStream(tokio::net::TcpStream);
 
 impl TcpStream {
     pub async fn connect(addr: impl ToSocketAddrs) -> Result<TcpStream> {
-        let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
-        tokio::net::TcpStream::connect(&*addrs).await.map(TcpStream)
+        tokio::net::TcpStream::connect(addr).await.map(TcpStream)
     }
 
     #[inline]
@@ -190,8 +179,7 @@ impl TcpListener {
     }
 
     pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<Self> {
-        let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
-        tokio::net::TcpListener::bind(&*addrs)
+        tokio::net::TcpListener::bind(addr)
             .await
             .map(TcpListener)
     }
@@ -206,8 +194,7 @@ pub struct UdpSocket(tokio::net::UdpSocket);
 
 impl UdpSocket {
     pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<UdpSocket> {
-        let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
-        tokio::net::UdpSocket::bind(&*addrs).await.map(UdpSocket)
+        tokio::net::UdpSocket::bind(addr).await.map(UdpSocket)
     }
 
     #[inline]
@@ -216,8 +203,7 @@ impl UdpSocket {
     }
 
     pub async fn connect(&self, addr: impl crate::net::ToSocketAddrs) -> Result<()> {
-        let addrs = addr.to_socket_addrs().await?.collect::<Vec<_>>();
-        self.0.connect(&*addrs).await
+        self.0.connect(addr).await
     }
 
     #[inline]
@@ -288,8 +274,7 @@ impl UdpSocket {
     pub async fn send_to(
         &self, buf: &[u8], target: impl crate::net::ToSocketAddrs,
     ) -> Result<usize> {
-        let target = target.to_socket_addrs().await?.collect::<Vec<_>>();
-        self.0.send_to(buf, &*target).await
+        self.0.send_to(buf, target).await
     }
 
     #[inline]

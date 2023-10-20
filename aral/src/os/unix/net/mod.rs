@@ -41,6 +41,7 @@ impl SocketAddr {
 pub struct UnixDatagram(ImpUnixDatagram);
 
 impl UnixDatagram {
+    #[inline]
     pub async fn bind(path: impl AsRef<Path>) -> Result<Self> {
         ImpUnixDatagram::bind(path).await.map(UnixDatagram)
     }
@@ -55,6 +56,7 @@ impl UnixDatagram {
         self.0.local_addr().map(SocketAddr)
     }
 
+    #[inline]
     pub fn pair() -> Result<(UnixDatagram, UnixDatagram)> {
         ImpUnixDatagram::pair().map(|(a, b)| (UnixDatagram(a), UnixDatagram(b)))
     }
@@ -101,18 +103,22 @@ impl UnixDatagram {
 pub struct UnixStream(ImpUnixStream);
 
 impl UnixStream {
+    #[inline]
     pub async fn connect(path: impl AsRef<Path>) -> Result<UnixStream> {
         ImpUnixStream::connect(path).await.map(UnixStream)
     }
 
+    #[inline]
     pub fn local_addr(&self) -> Result<SocketAddr> {
         self.0.local_addr().map(SocketAddr)
     }
 
+    #[inline]
     pub fn pair() -> Result<(UnixStream, UnixStream)> {
         ImpUnixStream::pair().map(|(a, b)| (UnixStream(a), UnixStream(b)))
     }
 
+    #[inline]
     pub fn peer_addr(&self) -> Result<SocketAddr> {
         self.0.peer_addr().map(SocketAddr)
     }
@@ -140,6 +146,7 @@ impl Write for UnixStream {
 pub struct UnixListener(ImpUnixListener);
 
 impl UnixListener {
+    #[inline]
     pub async fn accept(&self) -> Result<(UnixStream, SocketAddr)> {
         self.0
             .accept()
@@ -147,10 +154,12 @@ impl UnixListener {
             .map(|(stream, addr)| (UnixStream(stream), SocketAddr(addr)))
     }
 
+    #[inline]
     pub async fn bind(path: impl AsRef<Path>) -> Result<UnixListener> {
         ImpUnixListener::bind(path).await.map(UnixListener)
     }
 
+    #[inline]
     pub fn local_addr(&self) -> Result<SocketAddr> {
         self.0.local_addr().map(SocketAddr)
     }

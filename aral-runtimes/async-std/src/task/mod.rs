@@ -24,6 +24,7 @@ impl<T> JoinHandle<T> {
 impl<T> Future for JoinHandle<T> {
     type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
 
+    #[inline]
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         pin!(&mut self.0).poll(cx).map(|t| Ok(t))
     }

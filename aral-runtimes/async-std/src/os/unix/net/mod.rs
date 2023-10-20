@@ -93,30 +93,36 @@ impl UnixStream {
             .map(UnixStream)
     }
 
+    #[inline]
     pub fn local_addr(&self) -> Result<SocketAddr> {
         self.0.local_addr().map(SocketAddr)
     }
 
+    #[inline]
     pub fn pair() -> Result<(UnixStream, UnixStream)> {
         AsyncStdUnixStream::pair().map(|(a, b)| (UnixStream(a), UnixStream(b)))
     }
 
+    #[inline]
     pub fn peer_addr(&self) -> Result<SocketAddr> {
         self.0.peer_addr().map(SocketAddr)
     }
 }
 
 impl Read for UnixStream {
+    #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         ReadExt::read(&mut self.0, buf).await
     }
 }
 
 impl Write for UnixStream {
+    #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
         WriteExt::write(&mut self.0, buf).await
     }
 
+    #[inline]
     async fn flush(&mut self) -> Result<()> {
         WriteExt::flush(&mut self.0).await
     }
@@ -138,6 +144,7 @@ impl UnixListener {
             .map(UnixListener)
     }
 
+    #[inline]
     pub fn local_addr(&self) -> Result<SocketAddr> {
         self.0.local_addr().map(SocketAddr)
     }

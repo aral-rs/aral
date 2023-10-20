@@ -75,6 +75,7 @@ impl Seek for File {
     }
 }
 
+#[derive(Default)]
 pub struct OpenOptions(async_std::fs::OpenOptions);
 
 impl OpenOptions {

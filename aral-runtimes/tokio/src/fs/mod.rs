@@ -76,6 +76,7 @@ impl Seek for File {
     }
 }
 
+#[derive(Default)]
 pub struct OpenOptions(tokio::fs::OpenOptions);
 
 impl OpenOptions {

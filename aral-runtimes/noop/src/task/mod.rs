@@ -18,6 +18,7 @@ pub struct JoinHandle<T>(PhantomData<T>);
 impl<T> Unpin for JoinHandle<T> {}
 
 impl<T> JoinHandle<T> {
+    #[inline]
     pub async fn cancel(self) -> Option<T> {
         no_runtime_specified!();
     }
@@ -26,6 +27,7 @@ impl<T> JoinHandle<T> {
 impl<T> Future for JoinHandle<T> {
     type Output = result::Result<T, Box<dyn Any + Send + 'static>>;
 
+    #[inline]
     fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         no_runtime_specified!();
     }

@@ -27,6 +27,7 @@ pub type Result<T> = result::Result<T, Box<dyn Any + Send + 'static>>;
 impl<T> Future for JoinHandle<T> {
     type Output = Result<T>;
 
+    #[inline]
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         Future::poll(pin!(&mut self.0), cx)
     }

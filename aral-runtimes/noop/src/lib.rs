@@ -1,3 +1,6 @@
+#![doc = include_str!("../README.md")]
+#![cfg_attr(docs_rs, feature(doc_auto_cfg))]
+
 macro_rules! no_runtime_specified {
     () => {
         panic!("no runtime specified, please enable one of `runtime-*` features");

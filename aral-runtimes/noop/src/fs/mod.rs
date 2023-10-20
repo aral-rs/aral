@@ -50,22 +50,26 @@ impl File {
 }
 
 impl Read for File {
+    #[inline]
     async fn read(&mut self, _buf: &mut [u8]) -> Result<usize> {
         no_runtime_specified!();
     }
 }
 
 impl Write for File {
+    #[inline]
     async fn write(&mut self, _buf: &[u8]) -> Result<usize> {
         no_runtime_specified!();
     }
 
+    #[inline]
     async fn flush(&mut self) -> Result<()> {
         no_runtime_specified!();
     }
 }
 
 impl Seek for File {
+    #[inline]
     async fn seek(&mut self, _pos: SeekFrom) -> Result<u64> {
         no_runtime_specified!();
     }
@@ -74,36 +78,51 @@ impl Seek for File {
 pub struct OpenOptions;
 
 impl OpenOptions {
+    #[inline]
     pub fn append(&mut self, _append: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn create(&mut self, _create: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn create_new(&mut self, _create_new: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn new() -> OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub async fn open(&self, _path: impl AsRef<Path>) -> Result<File> {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn read(&mut self, _read: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn truncate(&mut self, _truncate: bool) -> &mut OpenOptions {
         no_runtime_specified!();
     }
 
+    #[inline]
     pub fn write(&mut self, _write: bool) -> &mut OpenOptions {
         no_runtime_specified!();
+    }
+}
+
+impl Default for OpenOptions {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
     }
 }
 
