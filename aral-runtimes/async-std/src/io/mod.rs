@@ -1,4 +1,7 @@
-use std::{io::{Result, SeekFrom}, future::Future};
+use std::{
+    future::Future,
+    io::{Result, SeekFrom},
+};
 
 pub trait Read {
     fn read(&mut self, buf: &mut [u8]) -> impl Future<Output = Result<usize>> + Send;

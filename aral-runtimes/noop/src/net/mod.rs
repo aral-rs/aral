@@ -1,7 +1,8 @@
 use crate::io::{Read, Write};
 use std::{
+    future::Future,
     io::Result,
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6}, future::Future,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
 pub trait ToSocketAddrs {

@@ -1,13 +1,15 @@
 use crate::io::{Read, Write};
 use std::{
+    future::Future,
     io::Result,
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6}, future::Future,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
 pub trait ToSocketAddrs: async_std::net::ToSocketAddrs {
     type Iter: Iterator<Item = SocketAddr>;
 
-    fn to_socket_addrs(&self) -> impl Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
+    fn to_socket_addrs(&self)
+        -> impl Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
 }
 
 impl ToSocketAddrs for (&str, u16) {
@@ -194,9 +196,7 @@ pub struct UdpSocket(async_std::net::UdpSocket);
 impl UdpSocket {
     #[inline]
     pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<UdpSocket> {
-        async_std::net::UdpSocket::bind(addr)
-            .await
-            .map(UdpSocket)
+        async_std::net::UdpSocket::bind(addr).await.map(UdpSocket)
     }
 
     #[inline]

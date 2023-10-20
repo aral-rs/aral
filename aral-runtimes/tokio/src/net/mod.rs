@@ -8,7 +8,9 @@ use tokio::net::lookup_host;
 pub trait ToSocketAddrs: tokio::net::ToSocketAddrs {
     type Iter: Iterator<Item = SocketAddr>;
 
-    fn to_socket_addrs(&self) -> impl std::future::Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
+    fn to_socket_addrs(
+        &self,
+    ) -> impl std::future::Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
 }
 
 impl ToSocketAddrs for (&str, u16) {
@@ -153,16 +155,19 @@ impl TcpStream {
 }
 
 impl Read for TcpStream {
+    #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         tokio::io::AsyncReadExt::read(&mut self.0, buf).await
     }
 }
 
 impl Write for TcpStream {
+    #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
         tokio::io::AsyncWriteExt::write(&mut self.0, buf).await
     }
 
+    #[inline]
     async fn flush(&mut self) -> Result<()> {
         tokio::io::AsyncWriteExt::flush(&mut self.0).await
     }
@@ -171,6 +176,7 @@ impl Write for TcpStream {
 pub struct TcpListener(tokio::net::TcpListener);
 
 impl TcpListener {
+    #[inline]
     pub async fn accept(&self) -> Result<(TcpStream, SocketAddr)> {
         self.0
             .accept()
@@ -178,10 +184,9 @@ impl TcpListener {
             .map(|(stream, addr)| (TcpStream(stream), addr))
     }
 
+    #[inline]
     pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<Self> {
-        tokio::net::TcpListener::bind(addr)
-            .await
-            .map(TcpListener)
+        tokio::net::TcpListener::bind(addr).await.map(TcpListener)
     }
 
     #[inline]
@@ -193,6 +198,7 @@ impl TcpListener {
 pub struct UdpSocket(tokio::net::UdpSocket);
 
 impl UdpSocket {
+    #[inline]
     pub async fn bind(addr: impl crate::net::ToSocketAddrs) -> Result<UdpSocket> {
         tokio::net::UdpSocket::bind(addr).await.map(UdpSocket)
     }
@@ -202,6 +208,7 @@ impl UdpSocket {
         self.0.broadcast()
     }
 
+    #[inline]
     pub async fn connect(&self, addr: impl crate::net::ToSocketAddrs) -> Result<()> {
         self.0.connect(addr).await
     }

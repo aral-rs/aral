@@ -3,14 +3,16 @@ use crate::{
     io::{Read, Write},
 };
 use std::{
+    future::Future,
     io::Result,
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6}, future::Future,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
 pub trait ToSocketAddrs: imp::net::ToSocketAddrs {
     type Iter: Iterator<Item = SocketAddr>;
 
-    fn to_socket_addrs(&self) -> impl Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
+    fn to_socket_addrs(&self)
+        -> impl Future<Output = Result<<Self as ToSocketAddrs>::Iter>> + Send;
 }
 
 impl ToSocketAddrs for (&str, u16) {
