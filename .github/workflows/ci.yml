@@ -18,14 +18,14 @@ jobs:
   required:
     name: Required
     needs:
-      - ci
+      - test
       - fmt
       - doc
     runs-on: ubuntu-20.04
     steps:
       - name: Check results
         run: |
-          [[ ${{ needs.ci.result }} == 'success' ]] || exit 1;
+          [[ ${{ needs.test.result }} == 'success' ]] || exit 1;
           [[ ${{ needs.fmt.result }} == 'success' ]] || exit 1;
           [[ ${{ needs.doc.result }} == 'success' ]] || exit 1;
   
@@ -39,7 +39,7 @@ jobs:
       - name: Cargo fmt
         uses: actions-rs/cargo@v1
         with:
-          toolchain: nightly
+          # toolchain: nightly
           command: fmt
           args: --all -- --check
   
@@ -82,8 +82,8 @@ jobs:
           command: rustdoc
           args: -p ${{ matrix.crate }} --release --all-features -- --cfg docs_rs
 
-  ci:
-    name: CI
+  test:
+    name: Test
     strategy:
       fail-fast: false
       matrix:
