@@ -1,6 +1,7 @@
 [package]
 name = "aral-runtime-tokio"
-version = "0.1.0-alpha.3"
+description = "Aral Runtime for tokio."
+version = "0.1.0-alpha.4"
 authors = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
