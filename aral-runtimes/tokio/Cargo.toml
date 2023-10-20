@@ -1,0 +1,15 @@
+[package]
+name = "aral-runtime-tokio"
+version = "0.1.0-alpha.3"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.33.0", features = ["fs", "time", "rt", "io-util", "net"] }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docs_rs"]

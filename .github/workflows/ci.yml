@@ -1,17 +1,3 @@
-# Copyright 2023 ARAL Development Team
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 name: CI
 
 on:
@@ -32,28 +18,72 @@ jobs:
   required:
     name: Required
     needs:
-      - ci
-      - license-check
+      - test
+      - fmt
+      - doc
     runs-on: ubuntu-20.04
     steps:
       - name: Check results
         run: |
-          [[ ${{ needs.ci.result }} == 'success' ]] || exit 1;
-          [[ ${{ needs.license-check.result }} == 'success' ]] || exit 1;
-
-  license-check:
-    name: license-check
+          [[ ${{ needs.test.result }} == 'success' ]] || exit 1;
+          [[ ${{ needs.fmt.result }} == 'success' ]] || exit 1;
+          [[ ${{ needs.doc.result }} == 'success' ]] || exit 1;
+  
+  fmt:
+    name: Fmt
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Check License Header
-        uses: apache/skywalking-eyes/header/@d5466651aaded6fbd588d2278eccc469afc89d92
-        with:
-          config: .licenserc.yaml
 
-  ci:
-    name: CI
+      - name: Cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          # toolchain: nightly
+          command: fmt
+          args: --all -- --check
+  
+  doc:
+    name: Doc
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - aral
+          - aral-runtime-noop
+          - aral-runtime-async-std
+          - aral-runtime-tokio
+
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cargo generate lockfile
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+
+      - name: Setup cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: doc-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cargo doc
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: rustdoc
+          args: -p ${{ matrix.crate }} --release --all-features -- --cfg docs_rs
+
+  test:
+    name: Test
     strategy:
       fail-fast: false
       matrix:
@@ -61,9 +91,8 @@ jobs:
           - ubuntu-20.04
         features:
           - ""
-          - "--features runtime-tokio-current-thread"
-          - "--features runtime-tokio-multi-thread"
-          - "--features runtime-async-std"
+          - "--features runtime-tokio --no-default-features"
+          - "--features runtime-async-std  --no-default-features"
           - "--all-features"
 
     runs-on: ${{ matrix.os }}
@@ -85,13 +114,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ matrix.os }}-ci-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+          key: ci-${{ matrix.os }}-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Cargo clippy
         uses: actions-rs/cargo@v1
@@ -105,9 +128,3 @@ jobs:
         with:
           command: test
           args: --workspace --release ${{ matrix.features }} -- --nocapture
-
-      - name: Cargo doc
-        uses: actions-rs/cargo@v1
-        with:
-          command: rustdoc
-          args: -p aral --release ${{ matrix.features }} -- --cfg docs_rs

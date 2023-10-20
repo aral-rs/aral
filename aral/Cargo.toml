@@ -1,0 +1,24 @@
+[package]
+name = "aral"
+description = "Async Runtime Aggregation Layer."
+version = "0.1.0-alpha.3"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+readme = "../README.md"
+
+[features]
+default = ["runtime-noop"]
+runtime-noop = ["aral-runtime-noop"]
+runtime-tokio = ["aral-runtime-tokio"]
+runtime-async-std = ["aral-runtime-async-std"]
+
+[dependencies]
+cfg-if = "1.0.0"
+aral-runtime-tokio = { workspace = true, optional = true }
+aral-runtime-async-std = { workspace = true, optional = true }
+aral-runtime-noop = { workspace = true, optional = true }
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docs_rs"]
