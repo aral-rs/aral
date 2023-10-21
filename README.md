@@ -9,7 +9,7 @@ It lets you switch the executors smooth and easy without having to change your a
 
 ## Runtime
 
-**Note**: Libraries should not enable any runtime feature. You can choose the executor, by using cargo features.
+**Note**: Libraries should not enable any runtime features. You can choose the executor, by using cargo features.
 There can only be one enabled runtime. Valid features are:
 
 - **runtime-tokio**
@@ -60,7 +60,7 @@ pub async fn is_file(path: &str) -> Result<bool> {
 }
 ```
 
-For application, use `aral` as a dependency and enable one `runtime-*` features (better to disable default features).
+For application, use `aral` as a dependency and enable one `runtime-*` features.
 
 ```toml
 # Cargo.toml
@@ -71,7 +71,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aral = { version = "*", features = ["runtime-tokio"], default-features = false }
+aral = { version = "*", features = ["runtime-tokio"] }
 tokio = { version = "1.33.0", features = ["full"] }
 foo = "0.1.0"
 ```
@@ -87,6 +87,8 @@ async fn main() {
    println!("{} is file: {:?}", path, is_file(path).await);
 }
 ```
+
+Now, you can easily switch between async runtimes by enabling other `runtime-*` features.
 
 ## License
 

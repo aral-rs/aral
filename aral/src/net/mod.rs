@@ -8,7 +8,30 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
-pub trait ToSocketAddrs: imp::net::ToSocketAddrs {
+trait ToSocketAddrsPriv: imp::net::ToSocketAddrs {}
+
+impl ToSocketAddrsPriv for (&str, u16) {}
+
+impl ToSocketAddrsPriv for (IpAddr, u16) {}
+
+impl ToSocketAddrsPriv for (Ipv4Addr, u16) {}
+
+impl ToSocketAddrsPriv for (Ipv6Addr, u16) {}
+
+impl ToSocketAddrsPriv for SocketAddr {}
+
+impl ToSocketAddrsPriv for str {}
+
+impl ToSocketAddrsPriv for String {}
+
+impl ToSocketAddrsPriv for SocketAddrV4 {}
+
+impl ToSocketAddrsPriv for SocketAddrV6 {}
+
+impl<'a> ToSocketAddrsPriv for &'a [SocketAddr] {}
+
+#[allow(private_bounds)]
+pub trait ToSocketAddrs: ToSocketAddrsPriv {
     type Iter: Iterator<Item = SocketAddr>;
 
     fn to_socket_addrs(&self)
