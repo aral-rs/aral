@@ -22,3 +22,29 @@ pub trait Write {
 pub trait Seek {
     fn seek(&mut self, pos: SeekFrom) -> impl Future<Output = Result<u64>> + Send;
 }
+
+pub struct Empty;
+
+impl Read for Empty {
+    #[inline]
+    async fn read(&mut self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+}
+
+impl BufRead for Empty {
+    #[inline]
+    async fn fill_buf(&mut self) -> Result<&[u8]> {
+        no_runtime_specified!();
+    }
+
+    #[inline]
+    fn consume(&mut self, _amt: usize) {
+        no_runtime_specified!();
+    }
+}
+
+#[inline]
+pub fn empty() -> Empty {
+    no_runtime_specified!();
+}

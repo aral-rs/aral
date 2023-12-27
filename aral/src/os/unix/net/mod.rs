@@ -131,6 +131,13 @@ impl Read for UnixStream {
     }
 }
 
+impl imp::io::Read for UnixStream {
+    #[inline]
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        imp::io::Read::read(&mut self.0, buf).await
+    }
+}
+
 impl Write for UnixStream {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
