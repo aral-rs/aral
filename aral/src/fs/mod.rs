@@ -64,6 +64,13 @@ impl Read for File {
     }
 }
 
+impl imp::io::Read for File {
+    #[inline]
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        imp::io::Read::read(&mut self.0, buf).await
+    }
+}
+
 impl Write for File {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize> {
