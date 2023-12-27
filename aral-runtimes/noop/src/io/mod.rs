@@ -7,6 +7,20 @@ pub trait Read {
     fn read(&mut self, buf: &mut [u8]) -> impl Future<Output = Result<usize>> + Send;
 }
 
+impl<T: ?Sized + Read + Unpin + Send> Read for &mut T {
+    #[inline]
+    async fn read(&mut self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+}
+
+impl<T: ?Sized + Read + Unpin + Send> Read for Box<T> {
+    #[inline]
+    async fn read(&mut self, _buf: &mut [u8]) -> Result<usize> {
+        no_runtime_specified!();
+    }
+}
+
 pub trait BufRead: Read {
     fn fill_buf(&mut self) -> impl Future<Output = Result<&[u8]>> + Send;
 
