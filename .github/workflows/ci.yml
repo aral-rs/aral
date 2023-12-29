@@ -36,10 +36,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Rustup toolchain add nighty
+        run: rustup toolchain add nightly --component rustfmt
+
       - name: Cargo fmt
         uses: actions-rs/cargo@v1
         with:
-          # toolchain: nightly
+          toolchain: nightly
           command: fmt
           args: --all -- --check
   
@@ -58,6 +61,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      
+      - name: Rustup toolchain add nighty
+        run: rustup toolchain add nightly
 
       - name: Cargo generate lockfile
         uses: actions-rs/cargo@v1
