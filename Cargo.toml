@@ -14,6 +14,6 @@ repository = "https://github.com/aral-rs/aral.git"
 rust-version = "1.75"
 
 [workspace.dependencies]
-aral-runtime-tokio = { version = "0.1.0-alpha.5", path = "./aral-runtimes/tokio" }
-aral-runtime-async-std = { version = "0.1.0-alpha.5", path = "./aral-runtimes/async-std" }
-aral-runtime-noop = { version = "0.1.0-alpha.5", path = "./aral-runtimes/noop" }
+aral-runtime-tokio = { version = "0.1.0", path = "./aral-runtimes/tokio" }
+aral-runtime-async-std = { version = "0.1.0", path = "./aral-runtimes/async-std" }
+aral-runtime-noop = { version = "0.1.0", path = "./aral-runtimes/noop" }
