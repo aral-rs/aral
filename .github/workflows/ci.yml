@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Rustup toolchain add nighty
-        run: rustup toolchain add nightly
+        run: rustup toolchain add nightly --component rustfmt
 
       - name: Cargo fmt
         uses: actions-rs/cargo@v1
